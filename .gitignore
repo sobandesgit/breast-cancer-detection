@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.env
+
+# Dataset — too large for GitHub
+dataset/
+
+# Model weights — exclude all except DenseNet121 weights (tracked by Git LFS)
+models/saved_models/VGG16_*
+models/saved_models/ResNet50_*
+models/saved_models/InceptionV3_*
+models/saved_models/DenseNet121_400X_best.h5
+models/saved_models/DenseNet121_400X_best.keras
+
+# Grad-CAM results — too large
+results/gradcam/
+
+# Static uploads
+static/uploads/
+
+# VS Code
+.vscode/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Windows
+Thumbs.db
