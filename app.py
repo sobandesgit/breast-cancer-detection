@@ -165,6 +165,7 @@ def predict():
 
 # ── Run ────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    import os
     print("\n" + "=" * 60)
     print("  Breast Cancer Detection — Web Application")
     print("  Author: Sobande Olukayode Oluwatofunmi (BU22CSC1016)")
@@ -173,4 +174,5 @@ if __name__ == "__main__":
     print("\n  DenseNet121 accuracy by magnification:")
     for mag, acc in MODEL_ACCURACY.items():
         print(f"    {mag} : {acc}")
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
