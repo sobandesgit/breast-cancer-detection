@@ -108,7 +108,7 @@ def health():
         "weights_found": status,
         "cwd": os.getcwd()
     })
-    
+
 @app.route("/predict", methods=["POST"])
 def predict():
     magnification = request.form.get("magnification", "400X")
@@ -140,12 +140,43 @@ def predict():
     # Load DenseNet121 for selected magnification
     try:
         model = get_model(magnification)
-    except FileNotFoundError:
+    except Exception as e:
         return jsonify({
-            "error": (
-                f"Model weights not found for "
-                f"{MODEL_NAME} | {magnification}"
-            )
+            "error": f"Model loading failed: {str(e)}"
+        }), 500
+
+    try:
+        # Predict
+        img_array  = preprocess_image(save_path)
+        pred_prob  = float(model.predict(img_array, verbose=0)[0][0])
+        label      = "Malignant" if pred_prob > 0.5 else "Benign"
+        confidence = pred_prob if pred_prob > 0.5 else 1 - pred_prob
+
+        # Generate Grad-CAM
+        os.makedirs("static/uploads/gradcam", exist_ok=True)
+        gradcam_path = save_gradcam(
+            MODEL_NAME,
+            save_path,
+            magnification,
+            model,
+            save_dir="static/uploads/gradcam"
+        )
+        gradcam_url = "/static/uploads/gradcam/" + os.path.basename(gradcam_path)
+
+        return jsonify({
+            "prediction"   : label,
+            "confidence"   : f"{confidence:.2%}",
+            "gradcam_url"  : gradcam_url,
+            "model_used"   : MODEL_NAME,
+            "magnification": magnification,
+            "model_accuracy": MODEL_ACCURACY[magnification]
+        })
+
+    except Exception as e:
+        import traceback
+        return jsonify({
+            "error": f"Prediction failed: {str(e)}",
+            "traceback": traceback.format_exc()
         }), 500
 
     # Predict
