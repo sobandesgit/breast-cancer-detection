@@ -57,18 +57,21 @@ model_cache = {}
 
 # ── Get model ──────────────────────────────────────────────────────────────────
 def get_model(magnification: str):
-    """
-    Returns cached DenseNet121 model for given magnification.
-    Loads and caches it on first request.
-    """
     if magnification not in model_cache:
-        print(f"  Loading DenseNet121 | {magnification}...")
-        model_cache[magnification] = load_model_from_weights(
-            MODEL_NAME, magnification
-        )
-        print(f"  Loaded successfully.")
+        import sys
+        print(f"Loading DenseNet121 | {magnification}...", flush=True)
+        sys.stdout.flush()
+        try:
+            model_cache[magnification] = load_model_from_weights(
+                MODEL_NAME, magnification
+            )
+            print(f"Loaded successfully.", flush=True)
+        except Exception as e:
+            import traceback
+            print(f"LOAD ERROR: {str(e)}", flush=True)
+            print(traceback.format_exc(), flush=True)
+            raise
     return model_cache[magnification]
-
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 def allowed_file(filename: str) -> bool:
