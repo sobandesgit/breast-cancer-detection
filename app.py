@@ -96,7 +96,19 @@ def index():
         model_name=MODEL_NAME
     )
 
-
+@app.route("/health")
+def health():
+    import os
+    status = {}
+    for mag in MAGNIFICATIONS:
+        path = f"models/saved_models/DenseNet121_{mag}_weights.weights.h5"
+        status[mag] = os.path.exists(path)
+    return jsonify({
+        "status": "running",
+        "weights_found": status,
+        "cwd": os.getcwd()
+    })
+    
 @app.route("/predict", methods=["POST"])
 def predict():
     magnification = request.form.get("magnification", "400X")
